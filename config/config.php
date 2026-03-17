@@ -1,10 +1,18 @@
 <?php
+require_once __DIR__ . '/../vendor/autoload.php';
 
-define('DB_HOST', '127.0.0.1');
-define('DB_DATABASE', 'crud_gestao_eventos');
-define('DB_POST', 3306);
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', 'dias_12345');
+use Dotenv\Dotenv;
 
-define('URL_BASE', 'http://localhost/crud_php/public/');
-define('APP_NAME', 'Sistema de Gestão de Eventos');
+// Carrega as variáveis do arquivo .env
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
+// Agora você define as constantes usando as variáveis de ambiente
+define('URL_BASE', $_ENV['URL_BASE']);
+
+// Configurações do Banco
+define('DB_HOST', $_ENV['DB_HOST']);
+define('DB_DATABASE', $_ENV['DB_DATABASE']);
+define('DB_USERNAME', $_ENV['DB_USERNAME']);
+define('DB_PASSWORD', $_ENV['DB_PASSWORD']);
+define('APP_NAME', $_ENV['APP_NAME']);
