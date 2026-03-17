@@ -83,4 +83,14 @@ class EventController extends Controller {
         
         $this->redirect('home/index');
     }
+
+    public function cancel_inscribe($id) {
+        $this->checkAuth();
+
+        $userId = $_SESSION['user_id'];
+        $eventUser = new EventRepository();
+        $eventInscribe = $eventUser->cancel_inscribe($id, $userId);
+        
+        $this->redirect('home/index');
+    }
 }

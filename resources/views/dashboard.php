@@ -85,10 +85,10 @@
     </div>
 
     <div class="row mb-5">
-        <?php if (empty($er)): ?>
+        <?php if (empty($allEventsInscribe)): ?>
             <div class="col-12"><p class="text-muted">Você ainda não se inscreveu em nada.</p></div>
         <?php else: ?>
-            <?php foreach ($er as $mi): ?>
+            <?php foreach ($allEventsInscribe as $mi): ?>
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm card-event border-start border-info border-4">
                         <div class="card-body">
@@ -97,10 +97,10 @@
                             <p class="small text-muted"><i class="bi bi-geo-alt"></i> <?= $mi['location'] ?></p>
                         </div>
                         <div class="card-footer bg-transparent border-0 d-flex gap-2 pb-3">
-                            <a href="<?= URL_BASE ?>event/show/<?= $event['id'] ?>" class="btn btn-sm btn-outline-info w-100 d-flex align-items-center justify-content-center">
+                            <a href="<?= URL_BASE ?>event/show/<?= $mi['id'] ?>" class="btn btn-sm btn-outline-info w-100 d-flex align-items-center justify-content-center">
                                 <i class="bi bi-eye me-1"></i> Ver Detalhes
                             </a>
-                            <form action="<?= URL_BASE ?>event/cancel/<?= $mi['id'] ?>" method="POST" class="w-100">
+                            <form action="<?= URL_BASE ?>event/cancel_inscribe/<?= $mi['id'] ?>" method="POST" class="w-100">
                                 <button type="submit" class="btn btn-sm btn-outline-secondary w-100 shadow-sm d-flex align-items-center justify-content-center" onclick="return confirm('Cancelar inscrição?')">Sair</button>
                             </form>
                         </div>

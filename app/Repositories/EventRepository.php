@@ -89,12 +89,36 @@ class EventRepository {
 
     public function all_events($userId) {
         try {
-            $sql = "SELECT * FROM events WHERE created_by != :userId ORDER BY event_date ASC";
+            $sql = "SELECT * FROM events 
+                WHERE created_by != :userId 
+                AND id NOT IN (
+                    SELECT event_id FROM registrations WHERE user_id = :userId
+                ) 
+                ORDER BY event_date ASC";
+
             $stmt = $this->db->prepare($sql);
 
             $stmt->bindValue(':userId', $userId);
             $stmt->execute();
             
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: null;
+
+        } catch (\PDOException $pd) {
+            echo 'Erro ao buscar no banco de dados: '. $pd->getMessage();
+        }
+    }
+
+    public function all_events_inscribe($userId) {
+        try {
+            $sql = "SELECT e.* FROM events e 
+                    INNER JOIN registrations i ON e.id = i.event_id 
+                    WHERE i.user_id = :userId 
+                    ORDER BY e.event_date ASC";
+                    
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':userId', $userId);
+            $stmt->execute();
+
             return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: null;
 
         } catch (\PDOException $pd) {
@@ -140,6 +164,39 @@ class EventRepository {
             }
 
             echo 'Erro ao criar ou atualizar no banco de dados: '. $pd->getMessage();
+            return false;
+        }
+    }
+
+   public function cancel_inscribe($id, $userId) {
+        try {
+            $this->db->beginTransaction();
+
+            $sqlReg = "DELETE FROM registrations WHERE event_id = :eventId AND user_id = :userId";
+            $stmtReg = $this->db->prepare($sqlReg);
+            $stmtReg->bindValue(':eventId', $id);
+            $stmtReg->bindValue(':userId', $userId);
+            $stmtReg->execute();
+
+            $sql = "UPDATE events SET number_registrations = number_registrations - 1 WHERE id = :id AND number_registrations > 0";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id', $id);
+            $stmt->execute();
+
+            $sqlReg = "DELETE FROM registrations WHERE event_id = :eventId AND user_id = :userId";
+            $stmtReg = $this->db->prepare($sqlReg);
+            $stmtReg->bindValue(':eventId', $id);
+            $stmtReg->bindValue(':userId', $userId);
+            $stmtReg->execute();
+
+            return $this->db->commit(); 
+
+        } catch (\PDOException $pd) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+
+            echo 'Erro ao deletar ou atualizar no banco de dados: '. $pd->getMessage();
             return false;
         }
     }

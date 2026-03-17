@@ -13,10 +13,12 @@ class HomeController extends Controller {
         $events = new EventRepository();
         $myEvents = $events->my_events($_SESSION['user_id']);
         $allEvents = $events->all_events($_SESSION['user_id']);
+        $allEventsInscribe = $events->all_events_inscribe($_SESSION['user_id']);
         
         $this->view('dashboard', [
             'myEvents' => $myEvents,
-            'allEvents' => $allEvents
+            'allEvents' => $allEvents,
+            'allEventsInscribe' => $allEventsInscribe,
         ]);
     }
 }
