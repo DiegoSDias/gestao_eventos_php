@@ -28,10 +28,12 @@ class UserController extends Controller {
     }
 
     public function create() {
+        
         $this->view('users/register');
     }
 
     public function store() {
+
         try {
             $dataUser = new UserDTO($_POST);
             $userService = new UserService;
@@ -52,6 +54,8 @@ class UserController extends Controller {
     }
 
     public function update() {
+        $this->checkAuth();
+
         $dataUser = new UserDTO($_POST);
         $updateUser = new UserService;
         $userId = $_SESSION['user_id'];
@@ -62,6 +66,8 @@ class UserController extends Controller {
     }
 
     public function delete() {
+        $this->checkAuth();
+
         session_start();
         $userId = $_SESSION['user_id'];
         $deletUser = new UserRepository();
@@ -74,6 +80,8 @@ class UserController extends Controller {
     }
 
     public function logout() {
+        $this->checkAuth();
+
         session_start();
         session_unset();
         session_destroy();

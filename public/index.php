@@ -29,9 +29,6 @@ $controllerCompleto = "App\\Controllers\\" . $controllerNome;
 $metodo = !empty($url[1]) ? $url[1] : 'index';
 $params = array_slice($url, 2);
 
-//var_dump($controllerNome); die();
-
-// Agora usamos a variável com o caminho completo
 if (class_exists($controllerCompleto)) {
     $controller = new $controllerCompleto();
     

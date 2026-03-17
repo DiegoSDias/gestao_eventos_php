@@ -16,6 +16,7 @@ CREATE TABLE events (
 	event_date DATETIME,
 	location VARCHAR(100),
 	created_at TIMESTAMP,
+	number_registrations int,
 	created_by INT, 
 	updated_at TIMESTAMP,
 	FOREIGN KEY (created_by) REFERENCES users(id)
