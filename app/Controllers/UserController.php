@@ -10,17 +10,21 @@ use App\Services\UserService;
 class UserController extends Controller {
 
     public function login() {
+        $this->checkNotAuth();
+
         $this->view('users/login');
     }
 
     public function authenticate() {
+        $this->checkNotAuth();
+
         try {
             $dataLogin = new UserDTO($_POST);
             $userLogin = new UserService();
             $resultado = $userLogin->login($dataLogin);
 
         } catch (\Throwable $th) {
-            $this->view('users/login', [$th]);
+            $this->view('users/login', ['erros' => $th->getMessage()]);
             return;
         }
 
@@ -28,11 +32,13 @@ class UserController extends Controller {
     }
 
     public function create() {
+        $this->checkNotAuth();
         
         $this->view('users/register');
     }
 
     public function store() {
+        $this->checkNotAuth();
 
         try {
             $dataUser = new UserDTO($_POST);

@@ -52,6 +52,17 @@
                         </div>
                     </div>
                 </div>
+                <?php if(!$inscrito): ?>
+                    <form action="<?= URL_BASE ?>event/inscribe/<?= $event['id'] ?>" method="POST" class="w-100 d-flex justify-content-center mb-4">
+                        <button type="submit" class="btn btn-success w-50 shadow-sm d-flex align-items-center justify-content-center py-2 fs-5">
+                            <i class="bi bi-plus-lg me-2"></i> Inscrever
+                        </button>
+                    </form>
+                <?php else: ?>
+                    <div class="w-100 d-flex justify-content-center mb-4">
+                        <span class="btn btn-success w-50 shadow-sm d-flex align-items-center justify-content-center py-2 fs-5">Você já está inscrito!</span>
+                    </div>
+                <?php endif; ?>
                 
                 <div class="card-footer bg-white p-4 border-top-0 text-center">
                     <p class="text-muted small">Evento criado em: <?= date('d/m/Y', $event['created_at']) ?></p>

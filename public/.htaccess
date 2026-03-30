@@ -4,6 +4,9 @@
     </IfModule>
 
     RewriteEngine On
+    
+    # Esta linha é OBRIGATÓRIA para projetos em subpastas no XAMPP:
+    RewriteBase /crud_php/public/
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

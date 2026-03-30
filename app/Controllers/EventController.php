@@ -33,14 +33,15 @@ class EventController extends Controller {
         $this->redirect('home/index');
     }
 
-    public function show($id) {
+    public function show($id, $inscrito = 0) {
         $this->checkAuth();
 
         $eventUser = new EventRepository();
         $eventShow = $eventUser->find_by_id($id);
         
         $this->view('events/show', [
-            'event' => $eventShow
+            'event' => $eventShow,
+            'inscrito' => $inscrito
         ]);
     }
 

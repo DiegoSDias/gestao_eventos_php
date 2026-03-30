@@ -151,7 +151,7 @@ class EventRepository {
             $stmtReg->bindValue(':user_id', $userId);
             $stmtReg->execute();
 
-            $sql = "UPDATE events SET number_registrations = number_registrations + 1 WHERE id = :id";
+            $sql = "UPDATE events SET number_registrations = COALESCE(number_registrations, 0) + 1 WHERE id = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id', $id);
             $stmt->execute();

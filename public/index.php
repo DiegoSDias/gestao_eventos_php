@@ -14,11 +14,12 @@ spl_autoload_register(function ($classe) {
     $caminhoRelativo = str_replace(['App\\', '\\'], ['', '/'], $classe);
     
     $arquivo = __DIR__ . '/../app/' . $caminhoRelativo . '.php';
-
+    
     if (file_exists($arquivo)) {
         require_once $arquivo;
     }
 });
+
 
 $url = isset($_GET['url']) ? $_GET['url'] : '/';
 $url = rtrim($url, '/');

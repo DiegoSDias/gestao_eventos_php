@@ -97,7 +97,7 @@
                             <p class="small text-muted"><i class="bi bi-geo-alt"></i> <?= $mi['location'] ?></p>
                         </div>
                         <div class="card-footer bg-transparent border-0 d-flex gap-2 pb-3">
-                            <a href="<?= URL_BASE ?>event/show/<?= $mi['id'] ?>" class="btn btn-sm btn-outline-info w-100 d-flex align-items-center justify-content-center">
+                            <a href="<?= URL_BASE ?>event/show/<?= $mi['id'] ?>/1" class="btn btn-sm btn-outline-info w-100 d-flex align-items-center justify-content-center">
                                 <i class="bi bi-eye me-1"></i> Ver Detalhes
                             </a>
                             <form action="<?= URL_BASE ?>event/cancel_inscribe/<?= $mi['id'] ?>" method="POST" class="w-100">

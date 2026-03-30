@@ -17,6 +17,11 @@ class UserService {
 
     public function login(UserDTO $data) {
         $checkEmailExist = $this->repository->check_email($data->email);
+        
+        if (!$checkEmailExist) {
+            throw new \Exception("Esse email e/ou senha estão incorretos.");
+        }
+
         $user = new User();
         $user->setName($checkEmailExist['name']);
         $user->setEmail($checkEmailExist['email']);
@@ -24,7 +29,7 @@ class UserService {
         
         $checkPassowrd = password_verify($data->password, $user->getPassword());
 
-        if(!$checkEmailExist or !$checkPassowrd) {
+        if(!$checkPassowrd) {
             throw new \Exception("Esse email e/ou senha estão incorretos.");
         }
 

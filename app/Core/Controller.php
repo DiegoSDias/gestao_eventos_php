@@ -23,6 +23,13 @@ abstract class Controller {
         }
     }
 
+    protected function checkNotAuth() {
+        if (isset($_SESSION['user_id'])) {
+            header("Location: " . URL_BASE . "home/index");
+            exit();
+        }
+    }
+
     protected function redirect(string $rota) {
         header("Location: " . URL_BASE . ltrim($rota, '/'));
         exit();

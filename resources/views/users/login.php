@@ -31,6 +31,14 @@
 
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary">Entrar</button>
+
+                            <?php if (isset($erros)): ?>
+                                <div class="alert alert-danger alert-dismissible fade show text-center small mt-4" role="alert">
+                                    <?= $erros; ?>
+                                </div>
+                            <?php endif; ?>
+
+                        
                             <hr>
                             <p class="text-center mb-0">
                                 Não tem conta? <a href="<?= URL_BASE ?>user/create">Cadastre-se</a>
@@ -39,6 +47,7 @@
 
                     </form>
                 </div>
+                
             </div>
         </div>
     </div>

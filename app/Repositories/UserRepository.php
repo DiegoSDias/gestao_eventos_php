@@ -18,6 +18,10 @@ class UserRepository {
     public function check_email($email) {
 
         try {
+            if (!$email) {
+                throw new \Exception("Esse email e/ou senha estão incorretos.");
+            }
+
             $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
             $stmt = $this->db->prepare($sql);
 
