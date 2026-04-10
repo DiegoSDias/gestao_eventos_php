@@ -45,7 +45,7 @@ CREATE TABLE registrations (
     registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_registration (user_id, event_id) -- Trava de segurança contra duplicidade
+    UNIQUE KEY unique_registration (user_id, event_id)
 );
 ```
 
@@ -72,7 +72,7 @@ DB_USER=root
 DB_PASS=
 
 # Configurações Globais
-URL_BASE=http://localhost/crud_php/
+URL_BASE=http://localhost/crud_php/public/
 ```
 Crie também um arquivo .env.example apenas com as chaves para servir de modelo.
 

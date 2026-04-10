@@ -21,6 +21,7 @@ class UserController extends Controller {
         try {
             $dataLogin = new UserDTO($_POST);
             $userLogin = new UserService();
+            
             $resultado = $userLogin->login($dataLogin);
 
         } catch (\Throwable $th) {

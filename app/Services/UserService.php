@@ -22,20 +22,14 @@ class UserService {
             throw new \Exception("Esse email e/ou senha estão incorretos.");
         }
 
-        $user = new User();
-        $user->setName($checkEmailExist['name']);
-        $user->setEmail($checkEmailExist['email']);
-        $user->setPassword($checkEmailExist['password']);
-        
-        $checkPassowrd = password_verify($data->password, $user->getPassword());
+        $checkPassowrd = password_verify($data->password, $checkEmailExist->password);
 
         if(!$checkPassowrd) {
             throw new \Exception("Esse email e/ou senha estão incorretos.");
         }
-
-        $_SESSION['user_id'] = $checkEmailExist['id'];
-        $_SESSION['user_name'] = $user->getName();
-        $_SESSION['user_email'] = $user->getEmail();
+        $_SESSION['user_id'] = $checkEmailExist->id;
+        $_SESSION['user_name'] = $checkEmailExist->name;
+        $_SESSION['user_email'] = $data->email;
 
         return true;
     }
@@ -49,12 +43,7 @@ class UserService {
             throw new \Exception("Este e-mail já está sendo usado por outro usuário.");
         }
 
-        $user = new User;
-        $user->setName($data->name);
-        $user->setEmail($data->email);
-        $user->setPassword($senhaHash);
-
-        return $this->repository->save_user($user);
+        return $this->repository->save_user($data, $senhaHash);
     }
 
     public function update_user(UserDTO $data, $userId) {
@@ -66,22 +55,18 @@ class UserService {
                 throw new \Exception("Este e-mail já está sendo usado por outro usuário.");
             }
         }
-
-        $user = new User();
-        $user->setName($data->name);
-        $user->setEmail($data->email);
         
         if(!empty($data->password)) {
-            $user->setPassword(password_hash($data->password, PASSWORD_DEFAULT));
+            $senhaHash = password_hash($data->password, PASSWORD_DEFAULT);
         } else {
-            $user->setPassword($currentUser['password']);
+            $senhaHash = $currentUser['password'];
         }
 
-        $resultado = $this->repository->update_user($user, $userId);
+        $resultado = $this->repository->update_user($data, $userId, $senhaHash);
         
         if($resultado) {
-            $_SESSION['user_name'] = $user->getName();
-            $_SESSION['user_email'] = $user->getEmail();
+            $_SESSION['user_name'] = $data->name;
+            $_SESSION['user_email'] = $data->email;
         }
 
         return $resultado;

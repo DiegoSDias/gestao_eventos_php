@@ -3,15 +3,14 @@
 namespace App\Repositories;
 
 use App\Core\Database;
+use App\DTOs\UserDTO;
 use App\Models\User;
 
 class UserRepository {
 
-    private $db;
-
     public function __construct()
     {
-        $this->db = Database::getConnection();
+        
     }
 
 
@@ -22,80 +21,70 @@ class UserRepository {
                 throw new \Exception("Esse email e/ou senha estão incorretos.");
             }
 
-            $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
-            $stmt = $this->db->prepare($sql);
-
-            $stmt->bindValue(':email', $email);
-            $stmt->execute();
-            
-            $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $user = User::where('email', $email)
+                    ->first();
 
             return $user ?: null;
 
-        } catch (\PDOException $pd) {
-            echo 'Erro ao verificar no banco: ' . $pd->getMessage();
+        } catch (\Throwable $e) {
+            echo 'Erro ao verificar no banco: ' . $e->getMessage();
         }
     }
 
 
-    public function save_user(User $data) {
+    public function save_user(UserDTO $data, $senhaHash) {
         try {
-            $sql = "INSERT INTO users (name, email, password) VALUES (:name, :email, :password)";
-            $stmt = $this->db->prepare($sql);
+            $userCreate = User::create([
+                'name' => $data->name,
+                'email' => $data->email,
+                'password' => $senhaHash,
+            ]);
 
-            $stmt->bindValue(':name', $data->getName());
-            $stmt->bindValue(':email', $data->getEmail());
-            $stmt->bindValue(':password', $data->getPassword());
-
-            return $stmt->execute();
-        } catch (\PDOException $pd) {
-            echo 'Erro ao salvar no banco: ' . $pd->getMessage();
+            return $userCreate ?: null;
+        } catch (\Throwable $e) {
+            echo 'Erro ao salvar no banco: ' . $e->getMessage();
         }
         
     }
 
     public function find_by_id($id) {
         try {
-            $sql = "SELECT * FROM users WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
+            $user = User::find($id);
 
-            $stmt->bindValue(':id', $id);
-            $stmt->execute();
+            return $user ?: null;
 
-            return $stmt->fetch() ?: null;
-
-        } catch (\PDOException $pd) {
-            echo 'Erro ao buscar no banco: ' . $pd->getMessage();
+        } catch (\Throwable $e) {
+            echo 'Erro ao buscar no banco: ' . $e->getMessage();
         }
         
     }
 
-    public function update_user(User $data, $id) {
+    public function update_user(UserDTO $data, $id, $senhaHash) {
         try {
-            $sql = "UPDATE users SET name = :name, email = :email, password = :password WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
+            
+            $userUpdate = User::find($id);
 
-            $stmt->bindValue(':name', $data->getName());
-            $stmt->bindValue(':email', $data->getEmail());
-            $stmt->bindValue(':password', $data->getPassword());
-            $stmt->bindValue(':id', $id);
+            $userUpdate->update([
+                'name' => $data->name,
+                'email' => $data->email,
+                'password' => $senhaHash,
+            ]);
 
-            return $stmt->execute();
-        } catch (\PDOException $pd) {
-            echo 'Erro ao atualizar no banco: ' . $pd->getMessage();
+            return $userUpdate ?: null;
+        } catch (\Throwable $e) {
+            echo 'Erro ao atualizar no banco: ' . $e->getMessage();
         }
     }
 
     public function delete_user($id) {
         try {
-            $sql = "DELETE FROM users WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
+            $user = User::where('id', $id)
+                    ->delete();
 
-            $stmt->bindValue(':id', $id);
-
-            return $stmt->execute();
-        } catch (\PDOException $pd) {
-            echo 'Erro ao deletar no banco: ' . $pd->getMessage();
+            return $user ?: null;
+        } catch (\Throwable $e) {
+            echo 'Erro ao deletar no banco: ' . $e->getMessage();
         }
     }
 }
+

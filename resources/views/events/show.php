@@ -65,7 +65,7 @@
                 <?php endif; ?>
                 
                 <div class="card-footer bg-white p-4 border-top-0 text-center">
-                    <p class="text-muted small">Evento criado em: <?= date('d/m/Y', $event['created_at']) ?></p>
+                    <p class="text-muted small">Evento criado em: <?= $event->created_at->format('d/m/Y') ?></p>
                 </div>
             </div>
         </div>

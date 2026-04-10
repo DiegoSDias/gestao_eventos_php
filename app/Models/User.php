@@ -2,39 +2,22 @@
 
 namespace App\Models;
 
-class User {
-    private $id;
-    private $name;
-    private $email;
-    private $password;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-    public function getId() {
-        return $this->id;
+class User extends Model{
+    protected $fillable = [
+        'name',
+        'email',
+        'password'
+    ];
+
+    public function events(): HasMany {
+        return $this->hasMany(Event::class, 'created_by', 'id');
     }
 
-    public function getName() {
-        return $this->name;
+    public function registrations(): HasMany {
+        return $this->hasMany(Registration::class, 'user_id', 'id');
     }
 
-    public function setName($name) {
-        $this->name = trim($name);
-    }
-
-    public function getEmail() {
-        return $this->email;
-    }
-
-    public function setEmail($email) {
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $this->email = $email;
-        }
-    }
-
-    public function getPassword() {
-        return $this->password;
-    }
-
-    public function setPassword($password) {
-        $this->password = $password;
-    }
 }

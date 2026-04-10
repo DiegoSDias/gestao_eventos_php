@@ -3,18 +3,15 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-use App\Core\Database;
 use App\DTOs\EventDTO;
 use App\Repositories\EventRepository;
 use App\Services\EventService;
 
 class EventController extends Controller {
 
-    private $db;
-
     public function __construct()
     {
-        $this->db = Database::getConnection();
+    
     }
 
     public function create() {

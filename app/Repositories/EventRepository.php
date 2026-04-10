@@ -2,201 +2,164 @@
 
 namespace App\Repositories;
 
-use App\Core\Database;
+use App\DTOs\EventDTO;
 use App\Models\Event;
-use DateTime;
+use App\Models\Registration;
+use Illuminate\Database\Capsule\Manager as DB;
 
 class EventRepository {
-    private $db;
 
     public function __construct()
     {
-        $this->db = Database::getConnection();
+        
     }
 
-    public function save_event(Event $data) {
+    public function save_event(EventDTO $data) {
         try {
-            $sql = "INSERT INTO events (title, description, event_date, location, created_by) VALUES (:title, :description, :event_date, :location, :created_by)";
-            $stmt = $this->db->prepare($sql);
+            $event = Event::create([
+                'title' => $data->title,
+                'description' => $data->description,
+                'event_date' => $data->event_date,
+                'location' => $data->location,
+                'created_by' => $_SESSION['user_id'],
+            ]);
+            
+            return $event ?: null;
 
-            $stmt->bindValue(':title', $data->getTitle());
-            $stmt->bindValue(':description', $data->getDescription());
-            $stmt->bindValue(':event_date', $data->getEventDate());
-            $stmt->bindValue(':location', $data->getLocation());
-            $stmt->bindValue(':created_by', $data->getCreatedBy());
-
-            return $stmt->execute();
-
-        } catch (\PDOException $pd) {
-            echo 'Erro ao criar no banco de dados: '. $pd->getMessage();
+        } catch (\Throwable $e) {
+            echo 'Erro ao criar no banco de dados: '. $e->getMessage();
         }
     }
 
-   public function update_event(Event $data, $idEvent) {
+   public function update_event(EventDTO $data, $idEvent) {
         try {
-            $sql = "UPDATE events SET 
-                    title = :title, 
-                    description = :description, 
-                    event_date = :event_date, 
-                    location = :location 
-                WHERE id = :id AND created_by = :created_by";
 
-            $stmt = $this->db->prepare($sql);
+            $eventUpdate = Event::where('id', $idEvent)
+                            ->where('created_by', $_SESSION['user_id'])
+                            ->update([
+                                'title' => $data->title, 
+                                'description' => $data->description, 
+                                'event_date' => $data->event_date, 
+                                'location' => $data->location
+                            ]);;
+            
 
-            $stmt->bindValue(':title', $data->getTitle());
-            $stmt->bindValue(':description', $data->getDescription());
-            $stmt->bindValue(':event_date', $data->getEventDate());
-            $stmt->bindValue(':location', $data->getLocation());
-            $stmt->bindValue(':created_by', $data->getCreatedBy());
-            $stmt->bindValue(':id', $idEvent);
-   
-            return $stmt->execute();
+            return $eventUpdate ?: null;
 
-        } catch (\PDOException $pd) {
-            echo 'Erro ao atualizar no banco de dados: '. $pd->getMessage();
+        } catch (\Throwable $e) {
+            echo 'Erro ao atualizar no banco de dados: '. $e->getMessage();
         }
    }
 
    public function delete_event($idEvent) {
         try {
-            $sql = "DELETE FROM events WHERE id = :id";
-
-            $stmt = $this->db->prepare($sql);
-
-            $stmt->bindValue(':id', $idEvent);
+            $eventDelete = Event::find($idEvent)->delete();
    
-            return $stmt->execute();
+            return $eventDelete ?: null;
 
-        } catch (\PDOException $pd) {
-            echo 'Erro ao deletar no banco de dados: '. $pd->getMessage();
+        } catch (\Throwable $e) {
+            echo 'Erro ao deletar no banco de dados: '. $e->getMessage();
         }
    }
 
     public function my_events($userId) {
         try {
-            $sql = "SELECT * FROM events WHERE created_by = :userId ORDER BY event_date ASC";
-            $stmt = $this->db->prepare($sql);
 
-            $stmt->bindValue(':userId', $userId);
-            $stmt->execute();
-            
-            return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: null;
+            $myEvents = Event::where('created_by', $userId)->orderBy('event_date', 'asc')->get();
+            return $myEvents ?: null;
 
-        } catch (\PDOException $pd) {
-            echo 'Erro ao buscar no banco de dados: '. $pd->getMessage();
+        } catch (\Throwable $e) {
+            echo 'Erro ao buscar no banco de dados: '. $e->getMessage();
         }
     }
 
     public function all_events($userId) {
         try {
-            $sql = "SELECT * FROM events 
-                WHERE created_by != :userId 
-                AND id NOT IN (
-                    SELECT event_id FROM registrations WHERE user_id = :userId
-                ) 
-                ORDER BY event_date ASC";
 
-            $stmt = $this->db->prepare($sql);
-
-            $stmt->bindValue(':userId', $userId);
-            $stmt->execute();
+            $allEvents = Event::where('created_by', '!=', $userId)
+                    ->whereDoesntHave('registrations', function ($query) use ($userId) {
+                        $query->where('user_id', $userId);
+                    })
+                    ->orderBy('event_date', 'asc')
+                    ->get();
             
-            return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: null;
+            return $allEvents ?: null;
 
-        } catch (\PDOException $pd) {
-            echo 'Erro ao buscar no banco de dados: '. $pd->getMessage();
+        } catch (\Throwable $e) {
+            echo 'Erro ao buscar no banco de dados: '. $e->getMessage();
         }
     }
 
     public function all_events_inscribe($userId) {
         try {
-            $sql = "SELECT e.* FROM events e 
-                    INNER JOIN registrations i ON e.id = i.event_id 
-                    WHERE i.user_id = :userId 
-                    ORDER BY e.event_date ASC";
-                    
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':userId', $userId);
-            $stmt->execute();
+            $eventsInscribe = Event::whereHas('registrations', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->orderBy('event_date', 'asc')
+            ->get();
 
-            return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: null;
+            return $eventsInscribe ?: null;
 
-        } catch (\PDOException $pd) {
-            echo 'Erro ao buscar no banco de dados: '. $pd->getMessage();
+        } catch (\Throwable $e) {
+            echo 'Erro ao buscar no banco de dados: '. $e->getMessage();
         }
     }
 
     public function find_by_id($id) {
         try {
-            $sql = "SELECT * FROM events WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
-
-            $stmt->bindValue(':id', $id);
-            $stmt->execute();
+            $event = Event::find($id);
             
-            return $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+            return $event ?: null;
 
-        } catch (\PDOException $pd) {
-            echo 'Erro ao buscar no banco de dados: '. $pd->getMessage();
+        } catch (\Throwable $e) {
+            echo 'Erro ao buscar no banco de dados: '. $e->getMessage();
         }
     }
 
    public function inscribe_event($id, $userId) {
         try {
-            $this->db->beginTransaction();
+            DB::beginTransaction();
 
-            $sqlReg = "INSERT INTO registrations (event_id, user_id, registration_date) VALUES (:event_id, :user_id, NOW())";
-            $stmtReg = $this->db->prepare($sqlReg);
-            $stmtReg->bindValue(':event_id', $id);
-            $stmtReg->bindValue(':user_id', $userId);
-            $stmtReg->execute();
+            Registration::create([
+                'event_id' => $id,
+                'user_id' => $userId,
+                'registration_date' => date('Y-m-d H:i:s')
+            ]);
 
-            $sql = "UPDATE events SET number_registrations = COALESCE(number_registrations, 0) + 1 WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':id', $id);
-            $stmt->execute();
+            Event::where('id', $id)->increment('number_registrations');
 
-            return $this->db->commit(); 
+            return DB::commit(); 
 
-        } catch (\PDOException $pd) {
-            if ($this->db->inTransaction()) {
-                $this->db->rollBack();
-            }
+        } catch (\Throwable $e) {
+                DB::rollBack();
 
-            echo 'Erro ao criar ou atualizar no banco de dados: '. $pd->getMessage();
+            echo 'Erro ao criar ou atualizar no banco de dados: '. $e->getMessage();
             return false;
         }
     }
 
    public function cancel_inscribe($id, $userId) {
         try {
-            $this->db->beginTransaction();
+            DB::beginTransaction();
+            
+            $deleted = Registration::where('event_id', $id)
+                                    ->where('user_id', $userId)
+                                    ->delete();
 
-            $sqlReg = "DELETE FROM registrations WHERE event_id = :eventId AND user_id = :userId";
-            $stmtReg = $this->db->prepare($sqlReg);
-            $stmtReg->bindValue(':eventId', $id);
-            $stmtReg->bindValue(':userId', $userId);
-            $stmtReg->execute();
-
-            $sql = "UPDATE events SET number_registrations = number_registrations - 1 WHERE id = :id AND number_registrations > 0";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':id', $id);
-            $stmt->execute();
-
-            $sqlReg = "DELETE FROM registrations WHERE event_id = :eventId AND user_id = :userId";
-            $stmtReg = $this->db->prepare($sqlReg);
-            $stmtReg->bindValue(':eventId', $id);
-            $stmtReg->bindValue(':userId', $userId);
-            $stmtReg->execute();
-
-            return $this->db->commit(); 
-
-        } catch (\PDOException $pd) {
-            if ($this->db->inTransaction()) {
-                $this->db->rollBack();
+            if ($deleted) {
+                Event::where('id', $id)
+                    ->where('number_registrations', '>', 0)
+                    ->decrement('number_registrations');
             }
 
-            echo 'Erro ao deletar ou atualizar no banco de dados: '. $pd->getMessage();
+            return DB::commit(); 
+
+        } catch (\Throwable $e) {
+            if (DB::inTransaction()) {
+                DB::rollBack();
+            }
+
+            echo 'Erro ao deletar ou atualizar no banco de dados: '. $e->getMessage();
             return false;
         }
     }

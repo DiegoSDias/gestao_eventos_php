@@ -16,25 +16,12 @@ class EventService {
     }
 
     public function create_event(EventDTO $data) {
-        $event = new Event();
-        $event->setTitle($data->title);
-        $event->setDescription($data->description);
-        $event->setEventDate($data->event_date);
-        $event->setLocation($data->location);
-        $event->setCreatedBy($_SESSION['user_id']);
 
-        return $this->repositoryEvent->save_event($event);
+        return $this->repositoryEvent->save_event($data);
     }
 
     public function update_event(EventDTO $data, $idEvent) {
 
-        $event = new Event();
-        $event->setTitle($data->title);
-        $event->setDescription($data->description);
-        $event->setEventDate($data->event_date);
-        $event->setLocation($data->location);
-        $event->setCreatedBy($_SESSION['user_id']);
-
-        return $this->repositoryEvent->update_event($event, $idEvent);
+        return $this->repositoryEvent->update_event($data, $idEvent);
     }
 }

@@ -21,7 +21,11 @@
         <div class="dropdown ms-auto">
             <button class="btn btn-light d-flex align-items-center gap-2 border-0" type="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
                 <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; font-weight: bold;">
-                    <?= strtoupper(substr($_SESSION['user_name'], 0, 1)) ?>
+                    <?php 
+                        $nomeUsuario = $_SESSION['user_name'] ?? 'Usuário'; 
+                        
+                        echo strtoupper(mb_substr($nomeUsuario, 0, 1)); 
+                    ?>
                 </div>
                 <span class="d-none d-md-inline"><?= $_SESSION['user_name'] ?></span>
                 <i class="bi bi-chevron-down small"></i>

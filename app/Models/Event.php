@@ -2,55 +2,27 @@
 
 namespace App\Models;
 
-class Event {
-    private $id;
-    private $title;
-    private $description;
-    private $event_date;
-    private $location;
-    private $created_by;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-    public function getId() {
-        return $this->id;
+class Event extends Model{
+
+    protected $fillable = [
+        'title',
+        'description',
+        'event_date',
+        'location',
+        'created_by',
+    ];
+
+    public function user(): BelongsTo {
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
-    public function getTitle() {
-        return $this->title;
+    public function registrations(): HasMany {
+        return $this->hasMany(Registration::class, 'event_id', 'id');
     }
 
-    public function setTitle($title) {
-        $this->title = trim($title);
-    }
 
-    public function getDescription() {
-        return $this->description;
-    }
-
-    public function setDescription($description) {
-        $this->description = $description;
-    }
-
-    public function getEventDate() {
-        return $this->event_date;
-    }
-
-    public function setEventDate($event_date) {
-        $this->event_date = $event_date;
-    }
-
-    public function getLocation() {
-        return $this->location;
-    }
-
-    public function setLocation($location) {
-        $this->location = $location;
-    }
-
-    public function getCreatedBy() {
-        return $this->created_by;
-    }
-
-    public function setCreatedBy($created_by) {
-        $this->created_by = $created_by;
-    }
 }
